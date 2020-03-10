@@ -1,0 +1,51 @@
+﻿
+@{
+    ViewBag.Title = "Client Existant";
+    Session.Clear();
+}
+@{ 
+    var o = new FormulaireIntervention.Models.ExistingClient();
+    var listClients = new List<FormulaireIntervention.Models.ExistingClient>();
+    listClients.AddRange(o.GetClientsList());
+    var clientsFullNameList = new List<string>();
+    foreach (var client in listClients)
+    {
+        clientsFullNameList.Add($@"[{client.ID}] {client.LastName} {client.FirstName}");
+    }
+    var selectListClients = new SelectList(clientsFullNameList);
+
+    if (IsPost && (Request.Form["existingClient"] != null || Request.Form["existingClient"] != ""))
+    {
+        try
+        {
+            var existingClient = Request.Form["existingClient"];
+            var clientID = existingClient.Split('[')[1].Split(']')[0].AsInt();
+
+            Session["ClientID"] = clientID;
+        }
+        catch(Exception ex)
+        {
+            <script>alert("@ex.Message;")</script>
+        }
+        finally
+        {
+        Response.Redirect("Intervention");
+        }
+
+}
+}
+<div class="">
+    <a class="btn-link" href="/">Home</a>
+</div>
+<h2 class="">Choisir un client</h2>
+<form action="" method="post">
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            <label for="firstName">Client: </label>
+            @Html.DropDownList("existingClient", selectListClients, new { @class = "form-control col-lg-3" })<br>
+            <input type="submit" value="Valider" class="btn btn-default" />
+        </div>
+    </div>
+</form>
+

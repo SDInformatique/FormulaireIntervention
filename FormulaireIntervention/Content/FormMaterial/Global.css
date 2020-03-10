@@ -1,0 +1,32 @@
+﻿
+@media only screen and (min-device-width: 480px) and (max-device-width: 640px) and (orientation: landscape) {
+
+
+}
+.home-header-text {
+    font-family: 'Roboto', sans-serif;
+    padding: 1.5rem 1rem;
+    margin-bottom: 2rem;
+    background-color: #aeea00;
+    border-radius: 3px;
+}
+
+.custom-button{
+    
+
+}
+.text-main {
+    color: black
+}
+
+.color-primary {
+    background-color: #aeea00
+}
+
+.color-primary-light {
+    background-color: #e4ff54
+}
+
+.color-primary-dark {
+    background-color: #79b700
+}

@@ -1,0 +1,60 @@
+﻿@model FormulaireIntervention.Models.Signature
+@{
+    @functions{
+        public string data { get; set; }
+
+        public void OnPost()
+        {
+            data = Request.Form["dataSignature"];
+            if (String.IsNullOrWhiteSpace(data)) return;
+
+            var base64Signature = data.Split(',')[1];            
+            var binarySignature = Convert.FromBase64String(base64Signature);
+
+            System.IO.File.WriteAllBytes("Signature.png", binarySignature);
+        }
+    }
+    if (IsPost)
+    {
+        OnPost();
+        Response.Redirect("Finish");
+    }
+    
+}
+
+@section Scripts{
+    <script type="text/javascript" src="~/Scripts/signature_pad.umd.js" runat="server"></script>
+    <script>
+        $(function () {
+
+            var canvas = document.querySelector('#signature');
+            var pad = new SignaturePad(canvas);
+            var data = "";
+            $('#accept').click(function () {
+
+                data = pad.toDataURL();
+                $('#savetarget').attr('src', data);;
+                $('#dataSignature').val(data)
+                pad.off();
+
+            });
+        });
+    </script>
+}
+
+<h2>Client Sign</h2>
+
+
+<div class="container container-fluid">
+    <form action="" method="post" class="form-group" runat="server">
+        <canvas class="panel panel-default" width="500" height="400" id="signature" style="border:1px solid black"></canvas>
+        <div class="row"><button type="button" id="accept" class="btn btn-primary">Accept signature</button></div>
+        <img class="img-fluid" width="500" height="400" id="savetarget" style="border:1px solid black" runat="server">
+        <div class="row" id="div2">
+            <input type="hidden" id="dataSignature" name="data" runat="server">
+            <button type="submit" id="save" class="btn btn-primary">Save</button>
+            <a name="dlSign" id="dlSign">Download Signature</a>
+
+        </div>
+    </form>
+</div>

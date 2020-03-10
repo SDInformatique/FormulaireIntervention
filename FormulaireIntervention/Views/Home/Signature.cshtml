@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Signature";
+    
+    if (IsPost)
+    {
+        var DB = new FormulaireIntervention.Models.DBConnection();           
+   
+        var interventionID = DB.GetLastInterventionID();
+        var clientID = DB.GetClientIDFromIntervention(interventionID);
+        var signData = Request.Form["signData"];
+        
+        DB.InsertClientSignature(clientID,interventionID,signData);
+
+        Response.Redirect("Finish");
+        
+    }
+
+
+}
+<div id="signature-pad" class="container container-fluid">
+    <div class="">
+        <canvas style="border:1px solid black" class="img-fluid"></canvas>
+    </div>
+    <div class="row">
+        <button type="button" class="btn btn-danger col-6" data-action="clear">Clear</button>
+        <button type="button" class="btn btn-primary col-6" data-action="save">Save</button>
+    </div>
+    <input type="hidden" id="hiddenDataField" />
+
+</div>
+
+<script src="~/Scripts/signature_pad.umd.js"></script>
+<script src="~/Scripts/app.js"></script>
+<script src="~/Scripts/signature.js"></script>
+

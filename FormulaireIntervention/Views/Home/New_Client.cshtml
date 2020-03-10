@@ -1,0 +1,79 @@
+﻿@{
+
+    ViewBag.Title = "Nouveau Client";
+    Session.Clear();
+    var errors = new List<string>();
+}
+
+@{
+    if (IsPost)
+    {
+        var db = new FormulaireIntervention.Models.DBConnection();
+        var firstName = Request.Form["firstName"];
+        var lastName = Request.Form["lastName"];
+        var address = Request.Form["address"];
+        var phoneNumber = Request.Form["phoneNumber"];
+
+        try
+        {
+            var verif = new FormulaireIntervention.Models.Verifications();
+
+            if (!verif.DuplicateClientVerification(firstName, lastName))
+            {                
+                db.InsertNewClientInDatabase(firstName, lastName, address, phoneNumber);
+            }
+            Session["ClientID"] = db.GetClientIDFromName(firstName,lastName);
+
+        }
+        catch (FormulaireIntervention.Models.MultipleUserWithSameName ex)
+        {
+            errors.Add(ex.Message);
+            Response.Redirect("New_Client");
+        }
+        catch(InvalidOperationException ex)
+        {
+            errors.Add(ex.Message);
+            Response.Redirect("New_Client");
+        }
+        catch(MySql.Data.MySqlClient.MySqlException ex)
+        {
+            errors.Add(ex.Message);        
+            Response.Redirect("New_Client");
+        }
+
+        Response.Redirect("Intervention");
+    }
+}
+<div class="">
+    <a class="btn-link" href="/">Home</a>
+</div>
+<h2 class="">Information sur le client</h2>
+<form action="" method="post">
+    <div class="form-horizontal">
+        <hr />
+        @{ 
+            if (errors.Count > 0)
+            {
+                foreach(var error in errors)
+                {
+                    <h5 class="alert-danger">@error</h5>
+                }
+            }
+        }
+        <div class="form-group">
+            <label for="firstName">Prénom: </label>
+            <input class="form-control" type="text" id="firstName" name="firstName"><br>
+
+            <label for="lastName">Nom: </label>
+            <input class="form-control" type="text" id="lastName" name="lastName"><br>
+
+            <label for="address">Adresse: </label>
+            <input class="form-control" type="text" id="address" name="address"><br>
+
+            <label for="phoneNumber">Numéro de téléphone: </label>
+            <input class="form-control" type="text" id="phoneNumber" name="phoneNumber"><br>
+
+            <input type="submit" value="Valider" class="btn btn-default" />
+        </div>
+    </div>
+</form>

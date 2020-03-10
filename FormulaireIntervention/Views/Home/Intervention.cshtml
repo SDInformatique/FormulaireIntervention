@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewBag.Title = "Intervention";
+}
+@{
+
+
+    var intervenant = "";
+    var intervType = "";
+    var intervDuration = "";
+
+
+    var o = new FormulaireIntervention.Models.Intervenant();
+    var it = new FormulaireIntervention.Models.InterventionType();
+
+    var listIntervenant = new List<FormulaireIntervention.Models.Intervenant>();
+    listIntervenant.AddRange(o.GetIntervenants());
+
+    var listInterventionType = new List<FormulaireIntervention.Models.InterventionType>();
+    listInterventionType.AddRange(it.GetInterventionTypes());
+
+    var listIntervenantName = new List<string>();
+    var listIntervenantTypeName = new List<string>();
+
+
+    foreach (var inter in listIntervenant)
+    {
+        listIntervenantName.Add($@"{inter.FirstName} {inter.LastName}");
+    }
+
+    foreach (var intType in listInterventionType)
+    {
+        listIntervenantTypeName.Add(intType.Type.ToString());
+    }
+
+    var selectListIntervenant = new SelectList(listIntervenantName);
+    var selectListInterventionType = new SelectList(listIntervenantTypeName);
+
+    if (IsPost)
+    {
+
+        intervenant = Request.Form["intervIntervenant"];
+        intervType = Request.Form["intervType"];
+        intervDuration = Request.Form["InterventionDuratation"];
+
+        int clientID = Session["ClientID"].ToString().AsInt();
+        int intervenantID = 0;
+        try
+        {
+            var db = new FormulaireIntervention.Models.DBConnection();
+
+            intervenantID = db.GetIntervenantID(intervenant.Split(' ')[0], intervenant.Split(' ')[1]);
+            db = new FormulaireIntervention.Models.DBConnection();
+            
+            db = new FormulaireIntervention.Models.DBConnection();
+            var intervTypeID = db.GetInterventionTypeID(intervType);
+            db = new FormulaireIntervention.Models.DBConnection();
+            if (clientID != 0)
+            {
+                db.InsertNewIntervention(intervenantID,clientID,intervTypeID, intervDuration);
+            }
+        }
+        catch (Exception e)
+        {
+            Response.Write($@"<script>alert('{e.Message}')</script>");
+        }
+        finally
+        {
+            var db = new FormulaireIntervention.Models.DBConnection();
+            Session.Add("interventionID",db.GetLastInterventionID());
+            Response.Redirect("Resume");
+        }
+    }
+
+
+}
+    <div class="">
+        <a class="display-1" href="/">Home</a>
+    </div>
+
+<h2 class="">Information sur l'intervention</h2>
+<form action="" method="post">
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            <label for="intervIntervenant">Intervenant</label>
+            @Html.DropDownList("intervIntervenant", selectListIntervenant, new { @class = "form-control col-lg-3" })<br>
+            <label for="intervType">Type d'intervention</label>
+            @Html.DropDownList("intervType", selectListInterventionType, new { @class = "form-control col-lg-3" })<br>
+            <label for="intervStart">Durée de l'intervention</label>
+            <input class="form-control col-lg-3"  name="InterventionDuratation" type="number" step="15" min="0" value="0"/>
+            <br />
+            <input class="btn btn-default" type="submit" value="Valider" /><br>
+        </div>
+    </div>
+</form>

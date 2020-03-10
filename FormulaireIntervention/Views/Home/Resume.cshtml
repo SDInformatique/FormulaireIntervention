@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Resume";
+
+    string clientID = "";
+    string clientFirstName= "";
+    string clientLastName= "";
+    string clientAddress= "";
+    string clientPhoneNumber= "";
+    string intervenantFullName= "";
+    string intervenantFirstName= "";
+    string intervenantLastName= "";
+    string interventionType= "";
+    string interventionDuration= "";
+
+
+
+    if (IsPost)
+    {
+        var clientObj = new FormulaireIntervention.Models.New_Client();
+        var intervenantObj = new FormulaireIntervention.Models.Intervenant();
+        var interventionTypeObj = new FormulaireIntervention.Models.InterventionType();
+        clientObj.ID = clientID.AsInt();
+        clientObj.FirstName = clientFirstName;
+        clientObj.LastName = clientLastName;
+        clientObj.Address = clientAddress;
+        clientObj.PhoneNumber = clientPhoneNumber;
+
+        intervenantObj.FirstName = intervenantFirstName;
+        intervenantObj.LastName = intervenantLastName;
+
+        interventionTypeObj.Type = interventionType;
+
+        var interventionObj = new FormulaireIntervention.Models.Intervention(clientObj,intervenantObj,interventionTypeObj);
+        try
+        {
+            interventionObj.CreateXML();
+        }catch(Exception e)
+        {
+
+        }
+
+
+        Response.Redirect("Signature");
+    }
+    else
+    {
+        var db = new FormulaireIntervention.Models.DBConnection();
+        int interventionID = db.GetLastInterventionID();
+        var listOfAllInfo = new List<string>();
+        try
+        {
+            db = new FormulaireIntervention.Models.DBConnection();
+            listOfAllInfo = db.FetchAllInfo(interventionID);
+            var verif = new FormulaireIntervention.Models.Verifications();
+            listOfAllInfo = verif.VerifyClientData(Session["ClientID"].ToString().AsInt(), listOfAllInfo);
+            
+        }
+        catch(Exception e)
+        {
+            Response.Write($@"<script>alert('{e.Message}')</script>");
+        }
+        clientID = Session["ClientID"].ToString();
+        clientFirstName = listOfAllInfo[0];
+        clientLastName = listOfAllInfo[1];
+        clientAddress = listOfAllInfo[2];
+        clientPhoneNumber = listOfAllInfo[3];
+        intervenantFullName = $@"{listOfAllInfo[4]} {listOfAllInfo[5]}";
+        intervenantFirstName = $@"{listOfAllInfo[5]}";
+        intervenantLastName = $@"{listOfAllInfo[4]}";
+        interventionType = listOfAllInfo[6];
+        interventionDuration = listOfAllInfo[7];
+    }
+
+
+}
+
+<div class="">
+    <a class="btn-link" href="/">Home</a>
+</div>
+<h2 class="">Résumé de l'intervention</h2>
+
+<form action="" method="post">
+    <div class="row">
+
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8 col-sm-12">
+            <ul class="list-group">
+                <li class="list-group-item"><h4>Information sur le client : </h4></li>
+                <li class="list-group-item"><p>ID du Client : @Html.DisplayName(clientID)</p></li>
+                <li class="list-group-item"><p>Nom du client : @Html.DisplayName(clientLastName)</p></li>
+                <li class="list-group-item"><p>Prénom du client : @Html.DisplayName(clientFirstName) </p></li>
+                <li class="list-group-item"><p>Adresse du client : @Html.DisplayName(clientAddress) </p></li>
+                <li class="list-group-item"><p>Numéro de téléphone du client : @Html.DisplayName(clientPhoneNumber)</p></li>
+            </ul>
+        </div>
+        <div class="col-lg-2"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8 col-sm-12">
+            <ul class="list-group">
+                <li class="list-group-item"><h4>Information sur l'intervention : </h4></li>
+                <li class="list-group-item">Intervenant : @Html.DisplayName(intervenantFullName)</li>
+                <li class="list-group-item">Type d'intervention : @Html.DisplayName(interventionType)</li>
+                <li class="list-group-item">Durée de l'intervention: @Html.DisplayName(interventionDuration)</li>
+            </ul>
+        </div>
+        <div class="col-lg-2"></div>
+
+        <input type="submit" value="Valider" class="btn btn-default" />
+    </div>
+
+</form>
