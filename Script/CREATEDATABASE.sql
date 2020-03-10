@@ -92,7 +92,7 @@ CREATE TABLE `view_intervention` (
 	`IntervenantLastName` VARCHAR(50) NULL COLLATE 'latin1_swedish_ci',
 	`InterventionTypeName` VARCHAR(50) NULL COLLATE 'latin1_swedish_ci',
 	`InterventionDuration` INT(11) NOT NULL
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- Listage de la structure de la vue formulaireintervention. view_intervention
 -- Suppression de la table temporaire et création finale de la structure d'une vue
@@ -102,3 +102,9 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `view_intervention` AS sele
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+
+CREATE USER 'DBconnector'@'localhost' IDENTIFIED BY 'Pa$$w0rd';
+GRANT USAGE ON *.* TO 'DBconnector'@'localhost';
+GRANT EXECUTE, SELECT, SHOW VIEW, ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, DELETE, DROP, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `formulaireintervention`.* TO 'test'@'localhost' WITH GRANT OPTION;
+
+
